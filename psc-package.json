@@ -4,7 +4,9 @@
   "source": "https://github.com/purescript/package-sets.git",
   "depends": [
     "effect",
+    "foldable-traversable",
     "prelude",
+    "profunctor-lenses",
     "psci-support"
   ]
 }

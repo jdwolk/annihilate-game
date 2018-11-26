@@ -1,7 +1,11 @@
-module Annihilator.Cards where
+module Annihilator.Core.Cards where
 
 import Prelude
 import Data.Show (class Show)
+import Data.Symbol (SProxy(..))
+import Data.Lens (Prism', prism', preview, lens, only, is, view)
+import Data.Lens.Record (prop)
+import Data.Maybe
 
 class PrettyPrint a where
   pretty :: a -> String
@@ -14,14 +18,13 @@ data Quark =
         , color :: Color
         , quarkType :: QuarkType
         }
+data Card = QuarkCard Quark | AnnihilateCard
 
 derive instance eqQuarkType :: Eq QuarkType
-
 derive instance eqColor :: Eq Color
-
 derive instance eqRegularOrAnti :: Eq RegularOrAnti
-
 derive instance eqQuark :: Eq Quark
+derive instance eqCard :: Eq Card
 
 instance showQuarkType :: Show QuarkType where
   show Up = "Up"
@@ -42,6 +45,10 @@ instance showRegularOrAnti :: Show RegularOrAnti where
 instance showQuark :: Show Quark where
   show = pretty
 
+instance showCard :: Show Card where
+  show (QuarkCard quark) = "Quark(" <> show quark <> ")"
+  show AnnihilateCard = "Annihlate"
+
 instance prettyPrintQuark :: PrettyPrint Quark where
   pretty (Quark { matterType: Anti, color: color, quarkType: quarkType }) =
     pretty Anti <> "-" <> pretty color <> " " <> pretty Anti <> "-" <> pretty quarkType
@@ -59,3 +66,33 @@ instance prettyPrintRegularOrAnti :: PrettyPrint RegularOrAnti where
 
 makeQuark :: RegularOrAnti -> Color -> QuarkType -> Quark
 makeQuark mt c qt = Quark { matterType: mt, color: c, quarkType: qt }
+
+makeQuarkCard :: RegularOrAnti -> Color -> QuarkType -> Card
+makeQuarkCard mt c qt = QuarkCard (makeQuark mt c qt)
+
+oppositeMatterType :: RegularOrAnti -> RegularOrAnti
+oppositeMatterType Regular = Anti
+oppositeMatterType _       = Regular
+
+flipCard :: Card -> Card
+flipCard AnnihilateCard = AnnihilateCard
+flipCard (QuarkCard (Quark { matterType: mt, color: c, quarkType: qt })) =
+  makeQuarkCard (oppositeMatterType mt) c qt
+
+-- lenses / prisms
+_quarkCardFocus = prism' QuarkCard case _ of
+  QuarkCard quark -> Just quark
+  _               -> Nothing
+_quark = lens (\(Quark q) -> q) (\_ -> Quark)
+_matterType = lens _.matterType $ _ { matterType = _ }
+_color = lens _.color $ _ { color = _ }
+
+-- from the perspective of a QuarkCard
+qcMatterType = preview (_quarkCardFocus <<< _quark <<< _matterType)
+qcColor = preview (_quarkCardFocus <<< _quark <<< _color)
+qcIsRegular qc = case qcMatterType qc of
+  Just Regular -> true
+  _            -> false
+qcIsAnti qc = case qcMatterType qc of
+  Just Anti -> true
+  _         -> false
