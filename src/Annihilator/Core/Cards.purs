@@ -64,11 +64,11 @@ instance prettyPrintColor :: PrettyPrint Color where
 instance prettyPrintRegularOrAnti :: PrettyPrint RegularOrAnti where
   pretty = show
 
-makeQuark :: RegularOrAnti -> Color -> QuarkType -> Quark
-makeQuark mt c qt = Quark { matterType: mt, color: c, quarkType: qt }
+quark :: RegularOrAnti -> Color -> QuarkType -> Quark
+quark mt c qt = Quark { matterType: mt, color: c, quarkType: qt }
 
-makeQuarkCard :: RegularOrAnti -> Color -> QuarkType -> Card
-makeQuarkCard mt c qt = QuarkCard (makeQuark mt c qt)
+quarkCard :: RegularOrAnti -> Color -> QuarkType -> Card
+quarkCard mt c qt = QuarkCard (quark mt c qt)
 
 oppositeMatterType :: RegularOrAnti -> RegularOrAnti
 oppositeMatterType Regular = Anti
@@ -77,7 +77,7 @@ oppositeMatterType _       = Regular
 flipCard :: Card -> Card
 flipCard AnnihilateCard = AnnihilateCard
 flipCard (QuarkCard (Quark { matterType: mt, color: c, quarkType: qt })) =
-  makeQuarkCard (oppositeMatterType mt) c qt
+  quarkCard (oppositeMatterType mt) c qt
 
 -- lenses / prisms
 _quarkCardFocus = prism' QuarkCard case _ of
