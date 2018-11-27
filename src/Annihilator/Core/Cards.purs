@@ -1,6 +1,11 @@
 module Annihilator.Core.Cards where
 
 import Prelude
+import Data.Generic.Rep as G
+import Data.Generic.Rep.Enum as GEnum
+import Data.Generic.Rep.Bounded as GBounded
+import Data.Enum (class Enum, class BoundedEnum, upFromIncluding)
+import Data.Bounded (bottom)
 import Data.Show (class Show)
 import Data.Symbol (SProxy(..))
 import Data.Lens (Prism', prism', preview, lens, only, is, view)
@@ -25,6 +30,21 @@ derive instance eqColor :: Eq Color
 derive instance eqRegularOrAnti :: Eq RegularOrAnti
 derive instance eqQuark :: Eq Quark
 derive instance eqCard :: Eq Card
+derive instance ordColor :: Ord Color
+derive instance genericColor :: G.Generic Color _
+
+instance boundedColor :: Bounded Color where
+  bottom = GBounded.genericBottom
+  top = GBounded.genericTop
+
+instance enumColor :: Enum Color where
+  pred = GEnum.genericPred
+  succ = GEnum.genericSucc
+
+instance boundedEnumColor :: BoundedEnum Color where
+  cardinality = GEnum.genericCardinality
+  toEnum = GEnum.genericToEnum
+  fromEnum = GEnum.genericFromEnum
 
 instance showQuarkType :: Show QuarkType where
   show Up = "Up"
@@ -96,3 +116,6 @@ qcIsRegular qc = case qcMatterType qc of
 qcIsAnti qc = case qcMatterType qc of
   Just Anti -> true
   _         -> false
+
+colors :: Array Color
+colors = upFromIncluding (bottom :: Color)

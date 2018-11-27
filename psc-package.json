@@ -4,7 +4,9 @@
   "source": "https://github.com/purescript/package-sets.git",
   "depends": [
     "effect",
+    "enums",
     "foldable-traversable",
+    "generics-rep",
     "partial",
     "prelude",
     "profunctor-lenses",
