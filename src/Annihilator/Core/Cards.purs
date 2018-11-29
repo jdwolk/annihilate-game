@@ -11,6 +11,8 @@ import Data.Symbol (SProxy(..))
 import Data.Lens (Prism', prism', preview, lens, only, is, view)
 import Data.Lens.Record (prop)
 import Data.Maybe
+import Data.Array (filter)
+import Partial.Unsafe (unsafePartial)
 
 class PrettyPrint a where
   pretty :: a -> String
@@ -117,5 +119,7 @@ qcIsAnti qc = case qcMatterType qc of
   Just Anti -> true
   _         -> false
 
-colors :: Array Color
-colors = upFromIncluding (bottom :: Color)
+qcColors cards = map (\x -> unsafePartial $ fromJust x) $ filter isJust $ map qcColor cards
+
+allColors :: Array Color
+allColors = upFromIncluding (bottom :: Color)
