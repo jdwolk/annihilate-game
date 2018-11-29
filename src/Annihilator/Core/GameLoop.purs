@@ -1,15 +1,17 @@
 module Annihilator.Core.GameLoop where
 
-import Prelude
-import Data.Map as Map
-import Data.Tuple
-import Data.Show (class Show)
-import Data.Array (elem)
-import Partial.Unsafe (unsafePartial)
-import Data.Maybe (Maybe(..), fromJust)
-import Data.Either (Either(..))
-import Data.Lens (lens, view, set)
 import Annihilator.Core.Cards
+import Prelude
+
+import Data.Array (elem)
+import Data.Either (Either(..))
+import Data.Generic.Rep as G
+import Data.Generic.Rep.Show as GShow
+import Data.Lens (lens, view, set)
+import Data.Map as Map
+import Data.Maybe (fromJust)
+import Data.Tuple (Tuple(..))
+import Partial.Unsafe (unsafePartial)
 
 type BeamDeck = Array Card
 type DiscardPile = Array Card
@@ -31,25 +33,15 @@ data GameState =
 
 derive instance eqGamePhase :: Eq GamePhase
 derive instance ordGamePhase :: Ord GamePhase
+derive instance genericGamePhase :: G.Generic GamePhase _
 derive instance eqGameState :: Eq GameState
+derive instance genericGameState :: G.Generic GameState _
 
 instance showGamePhase :: Show GamePhase where
-  show NewGame = "NewGame"
-  show BeamPhase = "BeamPhase"
-  show ColliderPhase = "ColliderPhase"
-  show RefreshPhase = "RefreshPhase"
-  show GameOver = "GameOver"
+  show = GShow.genericShow
 
 instance showGameState :: Show GameState where
-  show (GameState { currentPhase, beamDeck, discard, annihilated, background, detector, collider }) =
-    "GameState { currentPhase: " <> show currentPhase <> ", " <>
-               " beamDeck: " <> show beamDeck <> ", " <>
-               " discard: " <> show discard <> ", " <>
-               " annihilated: " <> show annihilated <> ", " <>
-               " background: " <> show background <> ", " <>
-               " detector: " <> show detector <> ", " <>
-               " collider: " <> show collider <> ", " <>
-               " }"
+  show = GShow.genericShow
 
 newGameState :: BeamDeck -> GameState
 newGameState beamDeck =
