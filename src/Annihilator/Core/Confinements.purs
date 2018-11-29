@@ -1,7 +1,7 @@
 module Annihilator.Core.Confinements where
 
 import Prelude
-import Data.Foldable (all, any)
+import Data.Foldable (all, any, and, or)
 import Data.Array (filter, length)
 import Annihilator.Core.Cards (Card, Color, qcColor, qcColors, qcIsRegular, qcIsAnti, allColors)
 
@@ -25,7 +25,15 @@ oneOfEachColor cards = all onlyOnce allColors where
 lengthIs :: forall a . Int -> Array a -> Boolean
 lengthIs n xs = (length xs) == n
 
+applyToAll :: forall a b . Array (a -> b) -> a -> Array b
+applyToAll fns a = map (\f -> f a) fns
+
+allTrue :: forall a . Array (a -> Boolean) -> a -> Boolean
+allTrue fs xs = and (applyToAll fs xs)
+
 isValidConfinement :: Array Card -> Boolean
-isValidConfinement cards = (lengthIs 3 cards && allRegular cards && oneOfEachColor cards)
-                       || (lengthIs 3 cards && allAnti cards && oneOfEachColor cards)
-                       || (lengthIs 2 cards && allSameColor cards)
+isValidConfinement cards =
+  or [ (allTrue [lengthIs 3, allRegular, oneOfEachColor] cards)
+     , (allTrue [lengthIs 3, allAnti, oneOfEachColor] cards)
+     , (allTrue [lengthIs 2, allSameColor] cards)
+     ]
