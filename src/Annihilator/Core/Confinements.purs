@@ -2,8 +2,9 @@ module Annihilator.Core.Confinements where
 
 import Prelude
 import Data.Foldable (and, all)
-import Data.Maybe (isJust)
+import Data.Maybe (Maybe(..), isJust, fromJust)
 import Data.Array (head, length, filter)
+import Partial.Unsafe (unsafePartial)
 import Annihilator.Core.Cards
 
 allRegular = all qcIsRegular
@@ -16,7 +17,9 @@ allSameColor qcs = result where
   result = allColor maybeFirstColor qcs
 
 oneOfEachColor qcs = all onlyOnce colors where
-  onlyOnce = \color -> (==) 1 $ length $ filter ((==) color) (map qcColor qcs)
+  colorsMatching c = filter ((==) c)
+  colors = map (\x -> unsafePartial $ fromJust x) $ filter isJust $ map qcColor qcs
+  onlyOnce color = (==) 1 $ length $ colorsMatching color colors
 
 lengthIs n xs = (length xs) == n
 
