@@ -1,0 +1,18 @@
+{
+  "name": "Annihilator",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "live-server --port=8081 & pulp --watch browserify --to dist/index.js "
+  },
+  "dependencies": {
+    "pulp": "^12.3.0",
+    "purescript-hedwig": "^0.1.0"
+  },
+  "main": "index.js",
+  "repository": "https://github.com/jdwolk/annihilate-game.git",
+  "author": "JD Wolk <jd@philosophie.is>",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
